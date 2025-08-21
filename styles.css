@@ -1,0 +1,74 @@
+.root {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+}
+
+.playersPanel {
+  width: 100vw;
+  height: 100vh;
+  gap: 5px;
+  position: fixed;
+  z-index: 1;
+}
+
+
+.player {
+  width: 100px;
+  height: 100px;
+  background: red;
+  position: absolute;
+}
+
+.player1 {
+  left: 0%;
+  top: 0%;
+}
+
+.player2 {
+  left: calc(50% - 50px);
+  top: 0%;
+}
+
+.player3 {
+  left: calc(100% - 100px);
+  top: 0%;
+}
+
+.player4 {
+  left: calc(100% - 100px);
+  top: calc(100% - 100px);
+}
+
+.player5 {
+  left: calc(50% - 50px);
+  top: calc(100% - 100px);
+}
+
+.player6 {
+  left: 0%;
+  top: calc(100% - 100px);
+}
+
+
+
+.gameBoard {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+}
+
+.board {
+  width: 50%;
+  height: 70%;
+  background-color: blue;
+  background-image: url(./public/board.jpg);
+  background-position: contain; /* centers the image */
+  background-repeat: no-repeat; /* prevents tiling */
+  position: absolute;
+  left: 25%;
+  top: 15%;
+}
