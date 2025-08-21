@@ -43,7 +43,3 @@ coverage/
 *.tmp
 *.temp
 
-# Other project-specific ignores
-css/
-js/
-
