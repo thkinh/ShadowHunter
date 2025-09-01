@@ -1,0 +1,50 @@
+import { WebSocket } from "ws";
+import { createPacket, parsePacket, MessageType } from "./packet.js"
+import { sleep } from "./utils.js" 
+import { c_handlers } from "./c_handlers.js"
+
+const IP = "localhost";
+const PORT = 7777;
+const client = new WebSocket(`ws://${IP}:${PORT}`);
+
+client.onerror = (err) => {
+  console.error(`❌ERROR: ${err}`);
+}
+
+client.onclose = () => {
+  console.log("🔌Connection closed (maybe server is down)");
+};
+
+client.onopen = () => {
+  console.log("Server found!");
+  
+  const packet = createPacket(MessageType.HELLO, "Hello server");
+  client.send(packet);
+  
+  async function test(c) {
+    await sleep(2 * 1000);
+    console.log("Roll the dices");
+    const packet2 =  createPacket(MessageType.GAME_CLIENT_ROLLDICE, {dice: [4,6]});
+    client.send(packet2);
+  }
+  test(client);
+}
+
+client.onmessage = (event) => {
+  const packet = parsePacket(event.data);
+  if(!packet){
+    return;
+  }
+  clientHandleArrivedPacket(packet, client);
+}
+
+function clientHandleArrivedPacket(packet, server, ws) {
+  const handler = c_handlers[packet.type];
+  if (handler) {
+    handler(packet, server, ws);
+  } else {
+    console.warn("Unknown message type:", packet.type);
+  }
+}
+
+
