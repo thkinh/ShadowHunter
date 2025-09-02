@@ -5,6 +5,12 @@ function c_handleRollDice(packet){
   console.log(dices);
 }
 
+function handleErrorPacket(packet){
+  console.log(`Received packet ${packet.type},`);
+  const source = packet.payload.source;
+  console.log(source);
+}
+
 function c_handleWelcome(packet, client){
   console.log(`Received packet ${packet.type},`);
   client.player = packet.payload.player;

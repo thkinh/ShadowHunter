@@ -2,6 +2,7 @@ const MessageType = Object.freeze({
   //100 is server client exhange messages
   //200 is server side game message
   //300 is client side game message
+  ERROR: 0,
   DEFAULT: 100,
   WELCOME: 101,
   HELLO: 102,
@@ -32,4 +33,28 @@ function parsePacket(message) {
   }
 }
 
-export {MessageType, createPacket, parsePacket};
+function createActionPacket(type, target) {
+  switch(type) {
+    case MessageType.GAME_CLIENT_ROLLDICE:
+      if(Object.prototype.toString.call(target) !== '[object Array]')
+      {
+        return JSON.stringify({
+          type: MessageType.ERROR
+        })
+      }
+      return createPacket(type, {dice: target});
+      break;
+    case MessageType.GAME_CLIENT_ATTACKS:
+
+      break;
+      
+  }
+
+  return JSON.stringify({
+    type,
+    length: JSON.stringify(payload).length,
+    payload,
+  })
+}
+
+export {createActionPacket, MessageType, createPacket, parsePacket};

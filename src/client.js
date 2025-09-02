@@ -1,5 +1,5 @@
 import { WebSocket } from "ws";
-import { createPacket, parsePacket, MessageType } from "./packet.js"
+import { createActionPacket, createPacket, parsePacket, MessageType } from "./packet.js"
 import { sleep } from "./utils.js" 
 import { c_handlers } from "./c_handlers.js"
 
@@ -24,8 +24,8 @@ client.onopen = () => {
   async function test(c) {
     await sleep(2 * 1000);
     console.log("Roll the dices");
-    const packet2 =  createPacket(MessageType.GAME_CLIENT_ROLLDICE, {dice: [4,6]});
-    client.send(packet2);
+    const packet2 = createActionPacket(MessageType.GAME_CLIENT_ROLLDICE, 4);
+    c.send(packet2);
   }
   test(client);
 }

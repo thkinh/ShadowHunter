@@ -1,6 +1,11 @@
 import { getRandomIntInclusive } from "./utils.js"
 import { MessageType, createPacket } from "./packet.js"
 
+function handleError(packet, server, ws){
+  console.log(`PACKET ERROR FROM CLIENT: ${ws.id}`)
+  ws.send(createPacket(MessageType.ERROR, {source: packet.type}))
+}
+
 function handleDefault(packet, server, ws) {
   console.log(`PACKET DEFAULT: ${packet.payload}`);
 }
@@ -24,6 +29,11 @@ function handleRollDice(packet, server, ws) {
       );
     }
   });
+}
+
+function handleAttacksPlayer(packet, server, ws) {
+  console.log(`Packet type: ${packet.type}`);
+  
 }
 
 // Export a map from MessageType → handler
