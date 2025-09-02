@@ -5,10 +5,10 @@ function c_handleRollDice(packet){
   console.log(dices);
 }
 
-function handleErrorPacket(packet){
-  console.log(`Received packet ${packet.type},`);
+function c_handleErrorPacket(packet){
+  console.log(`Received ERROR packet},`);
   const source = packet.payload.source;
-  console.log(source);
+  console.log("Source: " , source);
 }
 
 function c_handleWelcome(packet, client){
@@ -32,6 +32,7 @@ export const c_handlers = {
   [MessageType.WELCOME]: c_handleWelcome,
   [MessageType.PING]: c_handlePing,
   [MessageType.PONG]: c_handlePong,
+  [MessageType.ERROR]: c_handleErrorPacket,
   [MessageType.GAME_SERVER_RESPONSE_ROLLDICE]: c_handleRollDice,
 };
 

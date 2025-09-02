@@ -39,6 +39,7 @@ function handleAttacksPlayer(packet, server, ws) {
 // Export a map from MessageType → handler
 export const s_handlers = {
   [MessageType.DEFAULT]: handleDefault,
+  [MessageType.ERROR]: handleError,
   [MessageType.HELLO]: handleHello,
   [MessageType.GAME_CLIENT_ROLLDICE]: handleRollDice,
 };
