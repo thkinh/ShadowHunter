@@ -33,6 +33,8 @@ function handleRollDice(packet, server, ws) {
 
 function handleAttacksPlayer(packet, server, ws) {
   console.log(`Packet type: ${packet.type}`);
+  console.log(`Player ${packet.payload.targetId} is attacked by ${ws.id}`)
+  console.log(`Player ${packet.payload.targetId}'s HP is now -${packet.payload.damage}`)
   
 }
 
@@ -42,5 +44,6 @@ export const s_handlers = {
   [MessageType.ERROR]: handleError,
   [MessageType.HELLO]: handleHello,
   [MessageType.GAME_CLIENT_ROLLDICE]: handleRollDice,
+  [MessageType.GAME_CLIENT_ATTACKS]: handleAttacksPlayer,
 };
 

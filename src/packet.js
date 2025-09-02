@@ -33,7 +33,7 @@ function parsePacket(message) {
   }
 }
 
-function createActionPacket(type, target) {
+function createActionPacket(type, target, explicit) {
   switch(type) {
     case MessageType.GAME_CLIENT_ROLLDICE:
       if(Object.prototype.toString.call(target) !== '[object Array]')
@@ -45,7 +45,7 @@ function createActionPacket(type, target) {
       return createPacket(type, {dice: target});
       break;
     case MessageType.GAME_CLIENT_ATTACKS:
-
+      return createPacket(type, {targetId: target, damage: explicit});
       break;
       
   }

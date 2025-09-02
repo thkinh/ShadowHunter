@@ -3,7 +3,8 @@ import { createActionPacket, createPacket, parsePacket, MessageType } from "./pa
 import { sleep } from "./utils.js" 
 import { c_handlers } from "./c_handlers.js"
 
-const IP = `192.168.1.4`;
+//const IP = `192.168.1.4`;
+const IP = `localhost`;
 const PORT = 7777;
 const client = new WebSocket(`ws://${IP}:${PORT}`);
 
@@ -24,10 +25,16 @@ client.onopen = () => {
   async function test(c) {
     await sleep(2 * 1000);
     console.log("Roll the dices");
-    const packet2 = createActionPacket(MessageType.GAME_CLIENT_ROLLDICE, 4);
+    const packet2 = createActionPacket(MessageType.GAME_CLIENT_ROLLDICE, [4,6]);
     c.send(packet2);
+    await sleep(2 * 1000);
+    const packet3 = createActionPacket(MessageType.GAME_CLIENT_ATTACKS, 2009, 4);
+    c.send(packet3);
   }
   test(client);
+
+
+
 }
 
 client.onmessage = (event) => {
