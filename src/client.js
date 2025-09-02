@@ -3,7 +3,7 @@ import { createPacket, parsePacket, MessageType } from "./packet.js"
 import { sleep } from "./utils.js" 
 import { c_handlers } from "./c_handlers.js"
 
-const IP = "localhost";
+const IP = `192.168.1.4`;
 const PORT = 7777;
 const client = new WebSocket(`ws://${IP}:${PORT}`);
 
