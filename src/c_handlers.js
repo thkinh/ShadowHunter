@@ -33,6 +33,6 @@ export const c_handlers = {
   [MessageType.PING]: c_handlePing,
   [MessageType.PONG]: c_handlePong,
   [MessageType.ERROR]: c_handleErrorPacket,
-  [MessageType.GAME_SERVER_RESPONSE_ROLLDICE]: c_handleRollDice,
+  [MessageType.GAME_SERVER_ROLL_RESULT]: c_handleRollDice,
 };
 

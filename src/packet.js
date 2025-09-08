@@ -1,18 +1,33 @@
 const MessageType = Object.freeze({
-  //100 is server client exhange messages
-  //200 is server side game message
-  //300 is client side game message
+  //100: server-client exchange
   ERROR: 0,
   DEFAULT: 100,
   WELCOME: 101,
   HELLO: 102,
   PING: 104,
   PONG: 105,
-  GAME_SERVER_UPDATE_GAMESTATE: 200,
-  GAME_SERVER_RESPONSE_ROLLDICE: 201,
-  GAME_CLIENT_ROLLDICE: 301,
-  GAME_CLIENT_ATTACKS: 302,
-  GAME_CLIENT_USEITEM: 303,
+
+  //200: server -> client game messages
+  GAME_SERVER_START: 200,
+  GAME_SERVER_OVER: 201,
+  GAME_SERVER_UPDATE_GAMESTATE: 202,
+  GAME_SERVER_TURN_START: 210,
+  GAME_SERVER_TURN_END: 211,
+  GAME_SERVER_ROLL_RESULT: 220,
+  GAME_SERVER_MOVE_RESULT: 221,
+  GAME_SERVER_DRAWCARD_RESULT: 222,
+  GAME_SERVER_ATTACK_RESULT: 223,
+  GAME_SERVER_UPDATE_HP: 224,
+  GAME_SERVER_PLAYER_DEFEATED: 225,
+
+  //300: client -> server game messages
+  GAME_CLIENT_TURN_READY: 300,
+  GAME_CLIENT_USE_SKILL_REQUEST: 301,
+  GAME_CLIENT_USE_ITEM_REQUEST: 302,
+  GAME_CLIENT_ROLL_DICE_REQUEST: 303,
+  GAME_CLIENT_MOVE_REQUEST: 304,
+  GAME_CLIENT_ATTACK_REQUEST: 305,
+  GAME_CLIENT_RESYNC_REQUEST: 306,
 });
 
 function createPacket(type, payload) {
@@ -35,7 +50,7 @@ function parsePacket(message) {
 
 function createActionPacket(type, target, explicit) {
   switch(type) {
-    case MessageType.GAME_CLIENT_ROLLDICE:
+    case MessageType.GAME_CLIENT_ROLL_DICE_REQUEST:
       if(Object.prototype.toString.call(target) !== '[object Array]')
       {
         return JSON.stringify({
@@ -44,7 +59,7 @@ function createActionPacket(type, target, explicit) {
       }
       return createPacket(type, {dice: target});
       break;
-    case MessageType.GAME_CLIENT_ATTACKS:
+    case MessageType.GAME_CLIENT_ATTACK_REQUEST:
       return createPacket(type, {targetId: target, damage: explicit});
       break;
       

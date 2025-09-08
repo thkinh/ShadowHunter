@@ -22,7 +22,7 @@ function handleRollDice(packet, server, ws) {
   server.clients.forEach(client => {
     if (client.readyState === ws.OPEN) {
       client.send(
-        createPacket(MessageType.GAME_SERVER_RESPONSE_ROLLDICE, {
+        createPacket(MessageType.GAME_SERVER_ROLL_RESULT, {
           results,
           rollerId: ws.id,
         })
@@ -43,7 +43,7 @@ export const s_handlers = {
   [MessageType.DEFAULT]: handleDefault,
   [MessageType.ERROR]: handleError,
   [MessageType.HELLO]: handleHello,
-  [MessageType.GAME_CLIENT_ROLLDICE]: handleRollDice,
-  [MessageType.GAME_CLIENT_ATTACKS]: handleAttacksPlayer,
+  [MessageType.GAME_CLIENT_ROLL_DICE_REQUEST]: handleRollDice,
+  [MessageType.GAME_CLIENT_ATTACK_REQUEST]: handleAttacksPlayer,
 };
 
