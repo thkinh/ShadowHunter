@@ -27,3 +27,7 @@ function{
   }
 }
 
+# TODOLIST 9/9/25
+- Implement Action Queue
+- Implement Characters
+- Implement Win Conditions --> checkWinCondition(); Each Action added to ActionQueue must have its property of isAffectingWinCondition --> if has then it must call WinCondition(this Action) to check after execute that action.
