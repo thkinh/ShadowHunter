@@ -1,13 +1,22 @@
 import { shuffle } from "../utils.js";
+import {createPlayer} from "./player.js"
+import { GameBoard } from "./board.js"
 
-class GameState {
+export class GameState {
   constructor(totalPlayers, turn = 0, round = 0) {
     const { whiteCards, blackCards, hermitCards } = this.generateRandomCards();
     this.isOver = false;
-    this.whiteCards = whiteCards;
-    this.blackCards = blackCards;
-    this.hermitCards = hermitCards;
+    this.whiteDeck = whiteCards;
+    this.blackDeck = blackCards;
+    this.hermitDeck = hermitCards;
+    this.decks = new Map(); 
+    this.decks.set("White", this.whiteDeck);
+    this.decks.set("Black", this.blackDeck);
+    this.decks.set("Hermit", this.hermitDeck);
+    this.gameBoard = new GameBoard();
     this.totalPlayers = totalPlayers;
+    this.players = new Map(); 
+    this.maxPlayer = 8;
     this.turn = turn;
     this.round = round;
   }
@@ -24,5 +33,22 @@ class GameState {
   updateState() {
     this.turn++;
   }
+  
+  addPlayer(id) {
+    this.players.set(id, createPlayer(id));
+    return this.players.get(id);
+  }
 
+  drawCard(type) {
+    drawDeck = this.decks.get(type);
+    return drawDeck.pop();
+  }
 }
+
+
+//test
+const start  = performance.now();
+const gameState = new GameState(6, 0 ,0);
+gameState.addPlayer(2008);
+const end = performance.now();
+console.log(`Execution time: ${end - start} ms`);

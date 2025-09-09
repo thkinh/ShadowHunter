@@ -2,6 +2,7 @@ import { WebSocketServer } from "ws";
 import { createPacket, MessageType, parsePacket } from "./packet.js";
 import { s_handlers } from "./s_handlers.js";
 import { createPlayer } from "./game/player.js";
+import { GameState } from "./game/gameState.js"
 
 const PORT = 7777;
 const PING_INTERVAL = 5000; // every 5 seconds
@@ -9,6 +10,7 @@ const MAX_PLAYERS = 6;
 
 const server = new WebSocketServer({port: PORT});
 let nextClientID = 2008;
+const gameState = new GameState();
 
 console.log(`Server started on ${PORT}`);
 server.on("connection", (ws) => {
@@ -17,9 +19,9 @@ server.on("connection", (ws) => {
     ws.isAlive = true;
   });
 
-  const player = createPlayer(nextClientID++);
+  const player = gameState.addPlayer(nextClientID++);
   ws.id = player.id;
-  console.log(player);
+  console.log("Hello ", player);
   ws.send(createPacket(MessageType.WELCOME, {player}));
 
   console.log(`A client connected, total: ${server.clients.size}`);
