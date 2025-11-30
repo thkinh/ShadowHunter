@@ -32,6 +32,7 @@ function handleRollDice(packet, server, ws) {
 }
 
 function handleAttacksPlayer(packet, server, ws) {
+  // Push the action to action queue
   console.log(`Packet type: ${packet.type}`);
   console.log(`Player ${packet.payload.targetId} is attacked by ${ws.id}`)
   console.log(`Player ${packet.payload.targetId}'s HP is now -${packet.payload.damage}`)
@@ -39,11 +40,25 @@ function handleAttacksPlayer(packet, server, ws) {
 }
 
 // Export a map from MessageType → handler
-export const s_handlers = {
-  [MessageType.DEFAULT]: handleDefault,
-  [MessageType.ERROR]: handleError,
-  [MessageType.HELLO]: handleHello,
-  [MessageType.GAME_CLIENT_ROLL_DICE_REQUEST]: handleRollDice,
-  [MessageType.GAME_CLIENT_ATTACK_REQUEST]: handleAttacksPlayer,
-};
+//export const s_handlers = {
+//  [MessageType.DEFAULT]: handleDefault,
+//  [MessageType.ERROR]: handleError,
+//  [MessageType.HELLO]: handleHello,
+//  [MessageType.GAME_CLIENT_ROLL_DICE_REQUEST]: (packet, server, ws, actionQueue handleRollDice,
+//  [MessageType.GAME_CLIENT_ATTACK_REQUEST]: handleAttacksPlayer,
+//};
+
+//Use Factory instead of return a static object s_handler
+export function createPacketHandlers(gameState, actionQueue){
+  return {
+    [MessageType.DEFAULT]: handleDefault,
+    [MessageType.ERROR]: handleError,
+    [MessageType.HELLO]: handleHello,
+
+    //TODO: refractor the handleRollDice so that it add an action, not handling it directly
+    [MessageType.GAME_CLIENT_ROLL_DICE_REQUEST]: (packet, server, ws) => handleRollDice(packet, server, ws, gameState, actionQueue),
+    //TODO: refractor the handleAttacksPlayer so that it add an action, not handling it directly
+    [MessageType.GAME_CLIENT_ATTACK_REQUEST]: (packet, server, ws) => handleAttacksPlayer(gameState, actionQueue),
+  }
+}
 

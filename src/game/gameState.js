@@ -30,7 +30,18 @@ export class GameState {
     return { whiteCards, blackCards, hermitCards };
   }
 
-  updateState() {
+  update(changes) {
+    for(const change in changes){
+      if(change == 'players'){
+
+        continue;
+      }
+
+      this[change] = changes[change];
+    }
+  }
+
+  updateTurn() {
     this.turn++;
   }
   
@@ -42,6 +53,10 @@ export class GameState {
   drawCard(type) {
     drawDeck = this.decks.get(type);
     return drawDeck.pop();
+  }
+
+  getPlayer(id) {
+    return this.players.get(id);
   }
 }
 

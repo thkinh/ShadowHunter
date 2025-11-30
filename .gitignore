@@ -11,6 +11,7 @@ jspm_packages/
 # Build output
 dist/
 build/
+src/testing/
 out/
 .next/
 .nuxt/

@@ -1,16 +1,17 @@
 import { WebSocketServer } from "ws";
 import { createPacket, MessageType, parsePacket } from "./packet.js";
-import { s_handlers } from "./s_handlers.js";
-import { createPlayer } from "./game/player.js";
+import { createPacketHandlers } from "./s_handlers.js";
 import { GameState } from "./game/gameState.js"
+import { ActionQueue } from "./actionQueue.js";
 
+//Server defined properties
 const PORT = 7777;
 const PING_INTERVAL = 5000; // every 5 seconds
 const MAX_PLAYERS = 6;
-
 const server = new WebSocketServer({port: PORT});
-let nextClientID = 2008;
 const gameState = new GameState();
+const actionQueue = new ActionQueue();
+let   nextClientID = 2008;
 
 console.log(`Server started on ${PORT}`);
 server.on("connection", (ws) => {
@@ -38,6 +39,8 @@ server.on("connection", (ws) => {
     newServerHandleArrivedPacket(packet, server, ws);
   });
 })
+
+export const s_handlers = createPacketHandlers(gameState, actionQueue);
 
 function newServerHandleArrivedPacket(packet, server, ws) {
   const handler = s_handlers[packet.type];

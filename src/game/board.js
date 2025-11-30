@@ -13,7 +13,7 @@ export class GameBoard {
   }
 }
 
-class GameArea {
+export class GameArea {
   static ATTACK_RANGES = {
     2: [2, 3, 4, 5],
     3: [2, 3, 4, 5],
@@ -25,6 +25,10 @@ class GameArea {
     10: [8, 10],
   };
 
+  static isInRange(position){
+    return ATTACK_RANGES[position];
+  }
+
   constructor(name = "NULL", coordinates = 1, areaDecks = [], description = "NULL"){
     this.name = name;
     this.description = description;
@@ -34,7 +38,7 @@ class GameArea {
   }
 }
 
-
+// Usage
 const board  = new GameBoard();
 console.log(board.areas);
 

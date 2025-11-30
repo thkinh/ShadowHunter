@@ -1,0 +1,32 @@
+
+
+What does server know?
+Server has a gameState.
+Server has a actionQueue for handling actions retrived from packets. 
+At the end of each turn, Server calls actionQueue.forEach().eval.
+Each action have the property to determine if it change the global state of the gameState;.
+
+When an action.eval() changes the gameState, it return a result which is an object that whole changed properties in gameState;
+In gameState class:
+
+``
+
+function update(actionQueue) {
+    const result = actionQueue.map(action => action.eval());
+    applyChanges(result);
+}
+``
+
+
+
+Server: instance of the server.
+s_handler: handle arrived packets, server side.
+
+Client: instance of the client
+c_handler: handle arrived packets, client side.
+
+GameState: the current state of the game
+ActionQueue: action that need to update on game state
+
+
+
