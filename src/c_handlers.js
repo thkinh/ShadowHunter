@@ -1,3 +1,4 @@
+import { GameState } from "./game/gameState.js";
 import { createPacket, MessageType } from "./packet.js"
 
 function c_handleRollDice(packet){
@@ -27,12 +28,19 @@ function c_handlePong(packet){
   console.log(`Ping latency: ${latency} ms`);
 }
 
+function c_handleUpdateState(packet, client){
+  const newState = packet.payload;
+  client.gameState = newState;
+  console.log(gameState.dices);
+}
+
 // Export a map from MessageType → handler
 export const c_handlers = {
   [MessageType.WELCOME]: c_handleWelcome,
   [MessageType.PING]: c_handlePing,
   [MessageType.PONG]: c_handlePong,
   [MessageType.ERROR]: c_handleErrorPacket,
+  [MessageType.GAME_SERVER_UPDATE_GAMESTATE]: c_handleUpdateState,
   [MessageType.GAME_SERVER_ROLL_RESULT]: c_handleRollDice,
 };
 

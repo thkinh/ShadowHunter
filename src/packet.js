@@ -11,6 +11,7 @@ const MessageType = Object.freeze({
   GAME_SERVER_START: 200,
   GAME_SERVER_OVER: 201,
   GAME_SERVER_UPDATE_GAMESTATE: 202,
+  GAME_SERVER_PROCESS_QUEUE: 203,
   GAME_SERVER_TURN_START: 210,
   GAME_SERVER_TURN_END: 211,
   GAME_SERVER_ROLL_RESULT: 220,
@@ -57,12 +58,19 @@ function createActionPacket(type, target, explicit) {
           type: MessageType.ERROR
         })
       }
-      return createPacket(type, {dice: target});
-      break;
+      return createPacket(type, {dices: target});
+
     case MessageType.GAME_CLIENT_ATTACK_REQUEST:
       return createPacket(type, {targetId: target, damage: explicit});
-      break;
-      
+
+    case MessageType.GAME_CLIENT_MOVE_REQUEST:
+      return createPacket(type, { 
+          currentPosition: explicit.currentPosition, 
+          chosePosition: explicit.chosePosition, 
+        });
+
+    case MessageType.GAME_SERVER_PROCESS_QUEUE:
+      return createPacket(type, {});
   }
 
   return JSON.stringify({

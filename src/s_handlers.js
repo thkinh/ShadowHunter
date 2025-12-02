@@ -1,64 +1,67 @@
-import { getRandomIntInclusive } from "./utils.js"
 import { MessageType, createPacket } from "./packet.js"
+import { ResponseRollDices, RollDice, MovePlayer, ResponseMovePlayer } from "./action.js"
 
-function handleError(packet, server, ws){
+function handleError(packet){
   console.log(`PACKET ERROR FROM CLIENT: ${ws.id}`)
   ws.send(createPacket(MessageType.ERROR, {source: packet.type}))
 }
 
-function handleDefault(packet, server, ws) {
+function handleDefault(packet) {
   console.log(`PACKET DEFAULT: ${packet.payload}`);
 }
 
-function handleHello(packet, server, ws) {
+function handleHello(packet) {
   console.log(`PACKET HELLO: ${packet.payload}`);
 }
 
-function handleRollDice(packet, server, ws) {
+function handleProcessQueueRequest(packet, server, ws) {
   console.log(`Packet type: ${packet.type}`);
-  const { dice } = packet.payload; // e.g., [4, 6]
-  const results = dice.map(sides => getRandomIntInclusive(1, sides));
+  const context =  {
+    gameState: server.gameState,
+    actionQueue: server.actionQueue,
+    server,
+    ws
+  }
+  server.actionQueue.processAll(context);
+}
 
-  server.clients.forEach(client => {
-    if (client.readyState === ws.OPEN) {
-      client.send(
-        createPacket(MessageType.GAME_SERVER_ROLL_RESULT, {
-          results,
-          rollerId: ws.id,
-        })
-      );
-    }
-  });
+function handleRollDiceRequest(packet, server, ws) {
+  console.log(`Packet type: ${packet.type}`);
+  const { dices } = packet.payload;
+  if (!Array.isArray(dices)) {
+    throw new Error("Invalid payload: dice must be an array.")
+  };
+  //console.log("Dices recived from packet: ", dices);
+  const rollDiceAction = new RollDice(dices);
+  const responseAction = new ResponseRollDices(ws.id)
+  server.actionQueue.enqueue(rollDiceAction);
+  server.actionQueue.enqueue(responseAction);
+}
+
+//TODO: Fix this logic as well
+function handleMoveRequest(packet, server, ws) {
+  console.log(`Packet type: ${packet.type}`);
+  const currentPosition = packet.payload.currentPosition;
+  const chosePosition = packet.payload.chosePosition;
+  const moveRequest = new MovePlayer(ws.id, currentPosition, chosePosition);
+  server.actionQueue.enqueue(moveRequest);
 }
 
 function handleAttacksPlayer(packet, server, ws) {
-  // Push the action to action queue
-  console.log(`Packet type: ${packet.type}`);
-  console.log(`Player ${packet.payload.targetId} is attacked by ${ws.id}`)
-  console.log(`Player ${packet.payload.targetId}'s HP is now -${packet.payload.damage}`)
-  
 }
-
-// Export a map from MessageType → handler
-//export const s_handlers = {
-//  [MessageType.DEFAULT]: handleDefault,
-//  [MessageType.ERROR]: handleError,
-//  [MessageType.HELLO]: handleHello,
-//  [MessageType.GAME_CLIENT_ROLL_DICE_REQUEST]: (packet, server, ws, actionQueue handleRollDice,
-//  [MessageType.GAME_CLIENT_ATTACK_REQUEST]: handleAttacksPlayer,
-//};
-
+  
 //Use Factory instead of return a static object s_handler
-export function createPacketHandlers(gameState, actionQueue){
+export function createPacketHandlers(){
   return {
-    [MessageType.DEFAULT]: handleDefault,
-    [MessageType.ERROR]: handleError,
-    [MessageType.HELLO]: handleHello,
-
-    //TODO: refractor the handleRollDice so that it add an action, not handling it directly
-    [MessageType.GAME_CLIENT_ROLL_DICE_REQUEST]: (packet, server, ws) => handleRollDice(packet, server, ws, gameState, actionQueue),
-    //TODO: refractor the handleAttacksPlayer so that it add an action, not handling it directly
-    [MessageType.GAME_CLIENT_ATTACK_REQUEST]: (packet, server, ws) => handleAttacksPlayer(gameState, actionQueue),
+    [MessageType.DEFAULT]:(packet)  => handleDefault(packet),
+    [MessageType.ERROR]:  (packet)  => handleHello(packet),
+    [MessageType.HELLO]:  (packet)  => handleHello(packet),
+    [MessageType.GAME_SERVER_PROCESS_QUEUE]: handleProcessQueueRequest,
+    //TODO: refractor the handleRollDice so that it add an action to server.actionQueue, not handling it directly
+    [MessageType.GAME_CLIENT_ROLL_DICE_REQUEST]: handleRollDiceRequest,
+    //TODO: refractor the handleAttacksPlayer so that it add an action to server.actionQueue, not handling it directly
+    [MessageType.GAME_CLIENT_ATTACK_REQUEST]: handleAttacksPlayer,
+    [MessageType.GAME_CLIENT_MOVE_REQUEST]: handleMoveRequest,
   }
 }
 

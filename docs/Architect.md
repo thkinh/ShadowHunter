@@ -30,3 +30,6 @@ ActionQueue: action that need to update on game state
 
 
 
+When to update?
+
+

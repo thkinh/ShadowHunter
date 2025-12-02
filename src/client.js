@@ -2,14 +2,17 @@ import { WebSocket } from "ws";
 import { createActionPacket, createPacket, parsePacket, MessageType } from "./packet.js"
 import { sleep } from "./utils.js" 
 import { c_handlers } from "./c_handlers.js"
+import { GameState } from "./game/gameState.js"
 
 //const IP = `192.168.1.4`;
 const IP = `localhost`;
 const PORT = 7777;
 const client = new WebSocket(`ws://${IP}:${PORT}`);
 
+client.gameState = new GameState();
+
 client.onerror = (err) => {
-  console.error(`❌ERROR: ${err}`);
+  console.error(`❌CLIENT ERROR: ${err}`);
 }
 
 client.onclose = () => {
@@ -27,14 +30,13 @@ client.onopen = () => {
     console.log("Roll the dices");
     const packet2 = createActionPacket(MessageType.GAME_CLIENT_ROLL_DICE_REQUEST, [4,6]);
     c.send(packet2);
-    await sleep(2 * 1000);
-    const packet3 = createActionPacket(MessageType.GAME_CLIENT_ATTACK_REQUEST, 2009, 4);
-    c.send(packet3);
+    //await sleep(2 * 1000);
+    //const packet3 = createActionPacket(MessageType.GAME_CLIENT_ATTACK_REQUEST, 2009, 4);
+    //c.send(packet3);
+    const updateRequestPacket = createActionPacket(MessageType.GAME_SERVER_PROCESS_QUEUE);
+    c.send(updateRequestPacket);
   }
   test(client);
-
-
-
 }
 
 client.onmessage = (event) => {

@@ -19,6 +19,7 @@ export class GameState {
     this.maxPlayer = 8;
     this.turn = turn;
     this.round = round;
+    this.dices = [0,0]
   }
 
   generateRandomCards() {
@@ -36,7 +37,6 @@ export class GameState {
 
         continue;
       }
-
       this[change] = changes[change];
     }
   }

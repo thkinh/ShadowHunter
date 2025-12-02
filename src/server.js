@@ -9,18 +9,13 @@ const PORT = 7777;
 const PING_INTERVAL = 5000; // every 5 seconds
 const MAX_PLAYERS = 6;
 const server = new WebSocketServer({port: PORT});
-const gameState = new GameState();
-const actionQueue = new ActionQueue();
+server.gameState = new GameState();
+server.actionQueue = new ActionQueue();
 let   nextClientID = 2008;
 
 console.log(`Server started on ${PORT}`);
 server.on("connection", (ws) => {
-  ws.isAlive = true;
-  ws.on("pong", () => {
-    ws.isAlive = true;
-  });
-
-  const player = gameState.addPlayer(nextClientID++);
+  const player = server.gameState.addPlayer(nextClientID++);
   ws.id = player.id;
   console.log("Hello ", player);
   ws.send(createPacket(MessageType.WELCOME, {player}));
@@ -40,7 +35,7 @@ server.on("connection", (ws) => {
   });
 })
 
-export const s_handlers = createPacketHandlers(gameState, actionQueue);
+export const s_handlers = createPacketHandlers();
 
 function newServerHandleArrivedPacket(packet, server, ws) {
   const handler = s_handlers[packet.type];
@@ -52,15 +47,15 @@ function newServerHandleArrivedPacket(packet, server, ws) {
 }
 
 
-const interval = setInterval(() => {
-  server.clients.forEach(ws => {
-    // console.log(`Pinging client ${ws.id}`);
-    if (!ws.isAlive){ 
-      console.log("A client is dead") 
-      return ws.terminate(); // remove dead client
-    } 
-    ws.isAlive = false;
-    ws.ping(); // built-in ws ping
-  });
-}, PING_INTERVAL);
+//const interval = setInterval(() => {
+//  server.clients.forEach(ws => {
+//    // console.log(`Pinging client ${ws.id}`);
+//    if (!ws.isAlive){ 
+//      console.log("A client is dead") 
+//      return ws.terminate(); // remove dead client
+//    } 
+//    ws.isAlive = false;
+//    ws.ping(); // built-in ws ping
+//  });
+//}, PING_INTERVAL);
 
