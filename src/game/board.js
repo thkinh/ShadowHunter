@@ -8,8 +8,8 @@ export class GameBoard {
     this.areas.set(5 , new GameArea("Underworld Gate"  , 5 ,  ["Hermit", "White", "Black"]))
     this.areas.set(6 , new GameArea("Church"           , 6 ,  ["White"]))
     this.areas.set(8 , new GameArea("Cemetery"         , 8 ,  ["Black"]))
-    this.areas.set(9 , new GameArea("Weird Woods"      , 9 ,  []))
-    this.areas.set(10, new GameArea("Erstwhile Altar"  , 10,  []))
+    this.areas.set(9 , new GameArea("Weird Woods"      , 9 ,  [])) //Missing actions
+    this.areas.set(10, new GameArea("Erstwhile Altar"  , 10,  [])) //Missing actions
   }
 }
 
@@ -38,7 +38,5 @@ export class GameArea {
   }
 }
 
-// Usage
-const board  = new GameBoard();
-console.log(board.areas);
+export const gameBoard = Object.freeze(new GameBoard());
 

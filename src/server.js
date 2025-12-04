@@ -11,7 +11,7 @@ const MAX_PLAYERS = 6;
 const server = new WebSocketServer({port: PORT});
 server.gameState = new GameState();
 server.actionQueue = new ActionQueue();
-let   nextClientID = 2008;
+let nextClientID = 2008;
 
 console.log(`Server started on ${PORT}`);
 server.on("connection", (ws) => {

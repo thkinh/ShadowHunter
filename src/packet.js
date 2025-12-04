@@ -11,7 +11,6 @@ const MessageType = Object.freeze({
   GAME_SERVER_START: 200,
   GAME_SERVER_OVER: 201,
   GAME_SERVER_UPDATE_GAMESTATE: 202,
-  GAME_SERVER_PROCESS_QUEUE: 203,
   GAME_SERVER_TURN_START: 210,
   GAME_SERVER_TURN_END: 211,
   GAME_SERVER_ROLL_RESULT: 220,
@@ -23,12 +22,14 @@ const MessageType = Object.freeze({
 
   //300: client -> server game messages
   GAME_CLIENT_TURN_READY: 300,
-  GAME_CLIENT_USE_SKILL_REQUEST: 301,
-  GAME_CLIENT_USE_ITEM_REQUEST: 302,
-  GAME_CLIENT_ROLL_DICE_REQUEST: 303,
-  GAME_CLIENT_MOVE_REQUEST: 304,
-  GAME_CLIENT_ATTACK_REQUEST: 305,
-  GAME_CLIENT_RESYNC_REQUEST: 306,
+  GAME_CLIENT_PROCESS_QUEUE_REQUEST: 301,
+  GAME_CLIENT_USE_SKILL_REQUEST: 302,
+  GAME_CLIENT_USE_ITEM_REQUEST: 303,
+  GAME_CLIENT_ROLL_DICE_REQUEST: 304,
+  GAME_CLIENT_MOVE_REQUEST: 305,
+  GAME_CLIENT_MOVE_CONFIRM: 306,
+  GAME_CLIENT_ATTACK_REQUEST: 307,
+  GAME_CLIENT_RESYNC_REQUEST: 308,
 });
 
 function createPacket(type, payload) {
@@ -64,20 +65,29 @@ function createActionPacket(type, target, explicit) {
       return createPacket(type, {targetId: target, damage: explicit});
 
     case MessageType.GAME_CLIENT_MOVE_REQUEST:
-      return createPacket(type, { 
-          currentPosition: explicit.currentPosition, 
-          chosePosition: explicit.chosePosition, 
-        });
-
-    case MessageType.GAME_SERVER_PROCESS_QUEUE:
       return createPacket(type, {});
+
+    case MessageType.GAME_CLIENT_MOVE_CONFIRM:
+      return createPacket(type, {
+        currentPosition: explicit.currentPosition,
+        chosePosition: explicit.chosePosition
+      });
+
+    case MessageType.GAME_CLIENT_PROCESS_QUEUE_REQUEST:
+      return createPacket(type, {});
+
+    case MessageType.GAME_CLIENT_RESYNC_REQUEST:
+      return createPacket(type, {});
+    default:
+      console.log("What the heck is this message type?");
+      return;
   }
 
   return JSON.stringify({
     type,
     length: JSON.stringify(payload).length,
     payload,
-  })
+  });
 }
 
 export {createActionPacket, MessageType, createPacket, parsePacket};

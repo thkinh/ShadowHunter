@@ -1,10 +1,11 @@
 import { getRandomIntInclusive } from "./../utils.js"
 
-export function createPlayer(id, role, maxHP, hp = maxHP, items = []) {
+export function createPlayer(id, role, maxHP, hp = maxHP, items = [], position) {
   role  = role  ?? randomRole();
   maxHP = maxHP ?? 100;
   hp    = hp    ?? maxHP;
   items = items ?? [];
+  position = position ?? 0;
 
   return {
     id,
@@ -12,6 +13,7 @@ export function createPlayer(id, role, maxHP, hp = maxHP, items = []) {
     maxHP,
     hp,
     items,
+    position,
 
     showInfo() {
       console.log(`Role: ${this.role}`);

@@ -1,5 +1,5 @@
 import { MessageType, createPacket } from "./packet.js"
-import { ResponseRollDices, RollDice, MovePlayer, ResponseMovePlayer } from "./action.js"
+import { ResponseRollDices, RollDice, MovePlayer, ResponseMovePlayer, AttackAction, ResponseAttackAction, NetworkingAction, ResponseResyncAction } from "./action.js"
 
 function handleError(packet){
   console.log(`PACKET ERROR FROM CLIENT: ${ws.id}`)
@@ -12,6 +12,19 @@ function handleDefault(packet) {
 
 function handleHello(packet) {
   console.log(`PACKET HELLO: ${packet.payload}`);
+}
+
+function handleResyncRequest(packet, server, ws) {
+  console.log(`PACKET SYNC: ${packet.type}`)
+  const responseResyncAction = new ResponseResyncAction();
+  server.actionQueue.enqueue(responseResyncAction);
+  const context =  {
+    gameState: server.gameState,
+    actionQueue: server.actionQueue,
+    server,
+    ws,
+  }
+  server.actionQueue.processAll(context);
 }
 
 function handleProcessQueueRequest(packet, server, ws) {
@@ -33,21 +46,29 @@ function handleRollDiceRequest(packet, server, ws) {
   };
   //console.log("Dices recived from packet: ", dices);
   const rollDiceAction = new RollDice(dices);
-  const responseAction = new ResponseRollDices(ws.id)
+  const responseAction = new ResponseRollDices(ws.id);
   server.actionQueue.enqueue(rollDiceAction);
   server.actionQueue.enqueue(responseAction);
 }
 
-//TODO: Fix this logic as well
-function handleMoveRequest(packet, server, ws) {
+function handleMoveConfirm(packet, server, ws) {
   console.log(`Packet type: ${packet.type}`);
   const currentPosition = packet.payload.currentPosition;
   const chosePosition = packet.payload.chosePosition;
-  const moveRequest = new MovePlayer(ws.id, currentPosition, chosePosition);
-  server.actionQueue.enqueue(moveRequest);
+  const moveAction = new MovePlayer(ws.id, currentPosition, chosePosition);
+  const moveResponseAction = new ResponseMovePlayer (ws.id);
+  server.actionQueue.enqueue(moveAction);
+  server.actionQueue.enqueue(moveResponseAction);
 }
 
 function handleAttacksPlayer(packet, server, ws) {
+  console.log(`Packet type: ${packet.type}`);
+  const target = packet.payload.targetId;
+  const damage = packet.payload.damage;
+  const attackAction = new AttackAction(ws.id, target, damage);
+  const attackRespondAction = new ResponseAttackAction(ws.id, target);
+  server.actionQueue.enqueue(attackAction);
+  server.actionQueue.enqueue(attackRespondAction);
 }
   
 //Use Factory instead of return a static object s_handler
@@ -56,12 +77,12 @@ export function createPacketHandlers(){
     [MessageType.DEFAULT]:(packet)  => handleDefault(packet),
     [MessageType.ERROR]:  (packet)  => handleHello(packet),
     [MessageType.HELLO]:  (packet)  => handleHello(packet),
-    [MessageType.GAME_SERVER_PROCESS_QUEUE]: handleProcessQueueRequest,
-    //TODO: refractor the handleRollDice so that it add an action to server.actionQueue, not handling it directly
+    [MessageType.GAME_CLIENT_RESYNC_REQUEST]: (packet, server, ws) => handleResyncRequest(packet, server, ws),
+    [MessageType.GAME_CLIENT_PROCESS_QUEUE_REQUEST]: handleProcessQueueRequest,
     [MessageType.GAME_CLIENT_ROLL_DICE_REQUEST]: handleRollDiceRequest,
     //TODO: refractor the handleAttacksPlayer so that it add an action to server.actionQueue, not handling it directly
+    [MessageType.GAME_CLIENT_MOVE_CONFIRM]: handleMoveConfirm,
     [MessageType.GAME_CLIENT_ATTACK_REQUEST]: handleAttacksPlayer,
-    [MessageType.GAME_CLIENT_MOVE_REQUEST]: handleMoveRequest,
   }
 }
 

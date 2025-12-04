@@ -1,6 +1,5 @@
 import { shuffle } from "../utils.js";
 import {createPlayer} from "./player.js"
-import { GameBoard } from "./board.js"
 
 export class GameState {
   constructor(totalPlayers, turn = 0, round = 0) {
@@ -9,11 +8,6 @@ export class GameState {
     this.whiteDeck = whiteCards;
     this.blackDeck = blackCards;
     this.hermitDeck = hermitCards;
-    this.decks = new Map(); 
-    this.decks.set("White", this.whiteDeck);
-    this.decks.set("Black", this.blackDeck);
-    this.decks.set("Hermit", this.hermitDeck);
-    this.gameBoard = new GameBoard();
     this.totalPlayers = totalPlayers;
     this.players = new Map(); 
     this.maxPlayer = 8;
@@ -51,8 +45,15 @@ export class GameState {
   }
 
   drawCard(type) {
-    drawDeck = this.decks.get(type);
-    return drawDeck.pop();
+    const t = type.toLowerCase();
+
+    switch(t) {
+      case "white":  return this.whiteDeck.pop();
+      case "black":  return this.blackDeck.pop();
+      case "hermit": return this.hermitDeck.pop();
+      default:
+        throw new Error("Unknown deck type: " + type);
+    }
   }
 
   getPlayer(id) {

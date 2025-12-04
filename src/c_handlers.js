@@ -30,8 +30,41 @@ function c_handlePong(packet){
 
 function c_handleUpdateState(packet, client){
   const newState = packet.payload;
-  client.gameState = newState;
-  console.log(gameState.dices);
+  console.log(newState);
+  client.gameState.decks = newState.decks;
+  client.gameState.totalPlayers = newState.totalPlayerJoined;
+  client.gameState.players = newState.players;
+  client.gameState.turn = newState.turn;
+  client.gameState.round= newState.round;
+  client.gameState.dices= newState.dices;
+  console.log(client.gameState);
+}
+
+function c_handlePlayerMove(packet, client){
+  const movedPlayer = packet.payload.playerID;
+  const newPosition = packet.payload.confirmedPosition;
+  console.log(`--> Player ${movedPlayer} moved to ${newPosition}`);
+  if(client.player.position == newPosition || newPosition == 0) {
+    console.log(`Invalid movement: player ${movedPlayer}`);
+  }
+  if(client.playerID == movedPlayer) {
+    client.player.position = newPosition;
+  }
+}
+
+function c_handleAttackResult(packet, client) {
+  const targetId = packet.payload.targetId;
+  const targetHealth = packet.payload.targetHealth;
+  const attackerId = packet.payload.attackerId;
+  const attackerHealth = packet.payload.attackerHealth;
+  console.log(`Player ${attackerId} just attacked player ${targetId}`);
+  console.log(client.gameState);
+  const attacker = client.gameState.getPlayer(attackerId);
+  const target = client.gameState.getPlayer(targetId);
+  attacker.hp = attackerHealth;
+  target.hp = targetHealth;
+  console.log(`Player ${attackerId} is now ${attackerHealth}`);
+  console.log(`Player ${targetId} is now ${targetHealth}`);
 }
 
 // Export a map from MessageType → handler
@@ -42,5 +75,7 @@ export const c_handlers = {
   [MessageType.ERROR]: c_handleErrorPacket,
   [MessageType.GAME_SERVER_UPDATE_GAMESTATE]: c_handleUpdateState,
   [MessageType.GAME_SERVER_ROLL_RESULT]: c_handleRollDice,
+  [MessageType.GAME_SERVER_MOVE_RESULT]: c_handlePlayerMove,
+  [MessageType.GAME_SERVER_ATTACK_RESULT]: c_handleAttackResult,
 };
 
